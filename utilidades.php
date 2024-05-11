@@ -31,3 +31,11 @@ function CrearProducto($array){
     return true;
     
 }
+function generarToken($usuario) {
+    // Generar un token único
+    $token = bin2hex(openssl_random_pseudo_bytes(16));
+    
+    // Guardar el token en la base de datos o en algún otro lugar para validar en el futuro
+
+    return $token;
+}

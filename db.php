@@ -1,4 +1,9 @@
 <?php
+require_once "vendor/autoload.php";
+
+use Firebase\JWT\JWT;
+
+//datos de la base de datos
 
 $server = "localhost";
 $user = "root";
@@ -42,5 +47,18 @@ function ObtenerRegistros ($sqlstr, &$conexion = null ){
     return $resultArray;
 
 }
+/*
+function generarTokenjwt($usuario) {
+    // Generar un token único
+    $time = time();
+    $token = array(
+        "inicia" => $time, //Tiempo que inicia el token
+        "exp" => $time +(60*60*24), // Tiempo que expira un token 1 dia, 60 segundos*60minutos*24 horas  
+    );
+    
+    // Guardar el token en la base de datos o en algún otro lugar para validar en el futuro
+
+    return $token;
+}*/
     
 
