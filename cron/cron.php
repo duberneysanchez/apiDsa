@@ -24,7 +24,7 @@ while (true) {
 }*/
 
 // Temporizador interno que se ejecuta continuamente
-while (true) {
+/*while (true) {
     // Obtener la hora actual menos 10 días (864000 segundos)
     $limit_timestamp = time() - (10 * 24 * 60 * 60);
 
@@ -38,10 +38,54 @@ while (true) {
 
     // Esperar 5 minutos antes de volver a verificar
     sleep(5 * 60);
+}*/
+
+
+
+// Definir constantes
+define('LIMIT_TIME_DAYS', 10);
+
+function deleteExpiredTokens($limitTimestamp) {
+    $query = "DELETE FROM usuarios_token WHERE Fecha < ?";
+    $stmt = $GLOBALS['db']->prepare($query);
+    if ($stmt) {
+        $stmt->bind_param('i', $limitTimestamp);
+        if (!$stmt->execute()) {
+            logError('Error executing delete query: ' . $stmt->error);
+        } else {
+            echo "Expired tokens deleted successfully.\n";
+        }
+        $stmt->close();
+    } else {
+        logError('Error preparing delete query: ' . $GLOBALS['db']->error);
+    }
 }
 
+function markTokensInactive($limitTimestamp) {
+    $query = "UPDATE usuarios_token SET Estado = 'Inactivo' WHERE Estado = 'Activo' AND Fecha < ?";
+    $stmt = $GLOBALS['db']->prepare($query);
+    if ($stmt) {
+        $stmt->bind_param('i', $limitTimestamp);
+        if (!$stmt->execute()) {
+            logError('Error executing update query: ' . $stmt->error);
+        } else {
+            echo "Tokens marked as inactive successfully.\n";
+        }
+        $stmt->close();
+    } else {
+        logError('Error preparing update query: ' . $GLOBALS['db']->error);
+    }
+}
 
+function logError($message) {
+    error_log($message);
+}
 
+function processTokens() {
+    $limitTimestamp = time() - (LIMIT_TIME_DAYS * 24 * 60 * 60);
+    deleteExpiredTokens($limitTimestamp);
+    markTokensInactive($limitTimestamp);
+}
 
-
-
+// Ejecutar la limpieza de tokens
+processTokens();
